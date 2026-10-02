@@ -3,6 +3,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  fetchpatch,
   pythonOlder,
 
   # build-system
@@ -32,15 +33,24 @@
 
 buildPythonPackage rec {
   pname = "anyio";
-  version = "4.14.2";
+  version = "4.15.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "agronholm";
     repo = "anyio";
     tag = version;
-    hash = "sha256-MEU0c8/NI1vlyNtBsg/hGLv6DR619ZqoZzNY1eJLEWM=";
+    hash = "sha256-cuTOVLyqLfp4LMuBd1BnFgey2gu3wehDk7VAb7yoqng=";
   };
+
+  patches = [
+    (fetchpatch {
+      # https://github.com/agronholm/anyio/pull/1374
+      url = "https://github.com/agronholm/anyio/commit/9a7a1d2a68ec7b8216e14ab03b778af365d6fe67.patch";
+      sha256 = "sha256-e7ZjHkUUSZQhD4JOVie+DdynytdbQMcpeqUTFn/yJno=";
+      excludes = [ "docs/versionhistory.rst" ];
+    })
+  ];
 
   build-system = [ setuptools-scm ];
 
@@ -116,6 +126,8 @@ buildPythonPackage rec {
   disabledTestPaths = [
     # lots of DNS lookups
     "tests/test_sockets.py"
+    # Not relevant for NixOS; tests "source-less" installs.
+    "tests/test_lazyimport.py"
   ];
 
   __darwinAllowLocalNetworking = true;
