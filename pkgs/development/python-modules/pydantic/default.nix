@@ -82,6 +82,12 @@ buildPythonPackage rec {
     "tests/test_docs.py"
   ];
 
+  disabledTests = [
+    # typing-extensions 4.16 made sentinels picklable:
+    # https://github.com/python/typing_extensions/blob/main/CHANGELOG.md#release-4160rc1-june-24-2026
+    "test_missing_sentinel_pickle"
+  ];
+
   pythonImportsCheck = [ "pydantic" ];
 
   meta = {
